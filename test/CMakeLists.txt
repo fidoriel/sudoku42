@@ -6,8 +6,8 @@ enable_testing()
 
 set(SRC_F
     main.cpp
-    sudoku.cpp
-    sudoku.h
+    ../sudoku.cpp
+    ../sudoku.h
     )
 
 add_executable(sudoku42cmdl ${SRC_F})

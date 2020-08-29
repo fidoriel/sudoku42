@@ -34,19 +34,26 @@ void sudoku::printSudokuGrid()
 
 int sudoku::calculateSectorStart(int rc)
 {
-    if(rc >= 0 && rc < 3)
+    switch (rc)
     {
+    case 0:
+    case 1:
+    case 2:
         return 0;
-    }
-    if(rc >= 3 && rc < 6)
-    {
+        break;
+    case 3:
+    case 4:
+    case 5:
         return 3;
-    }
-    if(rc >= 6 && rc < 9)
-    {
+        break;
+    case 6:
+    case 7:
+    case 8:
         return 6;
+        break;    
+    default:
+        break;
     }
-    return 0;
 }
 
 bool sudoku::checkIfPossible(int row, int col, int number)
@@ -69,17 +76,15 @@ bool sudoku::checkIfPossible(int row, int col, int number)
     int rowSector = this->calculateSectorStart(row);
     int colSector = this->calculateSectorStart(col);
 
-    for (int i = 0; i < 3; i++)
+    for (int row = 0; row < 3; row++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int col = 0; col < 3; col++)
         {
-            if (this->sudokuGrid[rowSector+i][colSector+i] == number)
+            if (this->sudokuGrid[rowSector+row][colSector+col] == number)
             {
                 return false;
             }
-            
         }
-        
     }
     return true;
 }
@@ -128,5 +133,34 @@ int main(){
     su.solve();
     su.printSudokuGrid();
 }
+
+    int tmp = 0;
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            tmp += this->sudokuGrid[row][col];
+        }
+        if (tmp != 45)
+        {
+            return false;
+        }   
+        tmp = 0;    
+    }
+
+    tmp = 0;
+    for (int col = 0; col < 9; col++)
+    {
+        for (int row = 0; row < 9; row++)
+        {
+            tmp += this->sudokuGrid[row][col];
+        }
+        if (tmp != 45)
+        {
+            return false;
+        }  
+        tmp = 0;     
+    }
+
 
 */

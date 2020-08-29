@@ -1,0 +1,3 @@
+/Users/lucakleinschmidt/Documents/GitHub/sudoku42/build/CMakeFiles/rebuild_cache.dir
+/Users/lucakleinschmidt/Documents/GitHub/sudoku42/build/CMakeFiles/edit_cache.dir
+/Users/lucakleinschmidt/Documents/GitHub/sudoku42/build/CMakeFiles/sudoku42.dir

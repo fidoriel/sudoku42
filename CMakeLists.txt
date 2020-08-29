@@ -31,7 +31,7 @@ endif(wxWidgets_FOUND)
 
 # Define a variable containing a list of source files for the project
 set(SRC_FILES
-    main.cpp
+    GUIsudoku.cpp
     sudoku.cpp
     sudoku.h
     )
@@ -52,7 +52,7 @@ target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         RESOURCE "AppIcon.icns"
-        MACOSX_BUNDLE_ICON_FILE sAppIcon.icns
+        MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_COPYRIGHT "Copyright fidoriel 2020"
         MACOSX_BUNDLE_GUI_IDENTIFIER "sudoku42"
         )
