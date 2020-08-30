@@ -5,6 +5,9 @@
 #include <wx/panel.h>
 #include <wx/font.h>
 #include <wx/string.h>
+#include <wx/button.h>
+#include <wx/statbox.h>
+#include <wx/colour.h>
 
 #include "sudoku.h"
 
@@ -28,10 +31,14 @@ public:
     wxListBox *m_list1;
     wxGrid* sudokuGridTable;
     wxBoxSizer* sudokuSizerPanel;
+    wxBoxSizer* buttonSizerPanel;
     wxPanel* mainPanel;
     wxMenuBar* menuBar;
     wxMenu* fileMenu;
     wxMenu* helpMenu;
+    wxButton* solveBtn;
+    wxButton* emptyBtn;
+    wxStaticBox* ctrlBtnBox;
 
     sudoku* sudokuObj;
 
@@ -52,7 +59,7 @@ public:
 
 private:
     int cellSize = 50;
-    wxString tmp = "test";
+    wxString tmp;
     int twoDsudoku[9][9];
     int nrTmp;
 };
@@ -67,6 +74,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
     EVT_MENU(ID_SOLVE,  MyFrame::OnSolve)
     EVT_MENU(ID_EMPTY,  MyFrame::OnEmpty)
+
+    EVT_BUTTON(ID_SOLVE,  MyFrame::OnSolve)
+    EVT_BUTTON(ID_EMPTY,  MyFrame::OnEmpty)
 END_EVENT_TABLE()
 
 // Implements MyApp& GetApp()
@@ -130,19 +140,20 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     //-------------------------
     
     sudokuSizerPanel = new wxBoxSizer(wxVERTICAL);
+    //buttonSizerPanel = new wxBoxSizer(wxHORIZONTAL);
 
     //-------------------------
     // Creates a new grid child of panel
     //-------------------------
     
-    sudokuGridTable = new wxGrid(mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxUINT8_MAX);
+    sudokuGridTable = new wxGrid(mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
     // Grid
 	sudokuGridTable->CreateGrid(9, 9);
 	sudokuGridTable->EnableEditing(true);
 	sudokuGridTable->EnableGridLines(true);
     sudokuGridTable->SetMargins(0, 0);
-	sudokuGridTable->EnableDragGridSize(false);
+	sudokuGridTable->EnableDragGridSize(true);
 
     // Col
 	sudokuGridTable->EnableDragColMove(false);
@@ -170,11 +181,21 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 
 	sudokuGridTable->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
-    // add the grid to the sizer
-	sudokuSizerPanel->Add(sudokuGridTable, 1, wxALL | wxEXPAND);
+    //solveBtn = new wxButton(mainPanel, ID_SOLVE, "Solve", wxPoint(10, 10), wxSize(150, 50), wxTOP);
+    //emptyBtn = new wxButton(mainPanel, ID_EMPTY, "Empty", wxPoint(10, 10), wxSize(150, 50), wxTOP);
+
+    // add the grid and buttons to the sizer
+    //buttonSizerPanel->Add(solveBtn, 1, wxTOP);
+    //buttonSizerPanel->AddSpacer(10);
+    //buttonSizerPanel->Add(emptyBtn, 1, wxTOP);
+
+    sudokuSizerPanel->Add(sudokuGridTable, 1, wxALL | wxEXPAND);
+
+    //sudokuSizerPanel->Add(buttonSizerPanel, 1, wxALIGN_CENTER);
     // add the sizer to panel, layout and fit it
-	mainPanel->SetSizer(sudokuSizerPanel);
-	mainPanel->Layout();
+    //buttonSizerPanel->Layout();
+    mainPanel->SetSizer(sudokuSizerPanel);
+    mainPanel->Layout();
 	sudokuSizerPanel->Fit(this);
 }
 
@@ -191,6 +212,8 @@ void MyFrame::OnAbout(wxCommandEvent& event)
 
 void MyFrame::OnSolve(wxCommandEvent& event)
 {
+
+    //perform accepted number test and transform grid to array
     for (int row = 0; row < 9; row++)
     {
         for (int col = 0; col < 9; col++)
@@ -206,8 +229,41 @@ void MyFrame::OnSolve(wxCommandEvent& event)
             twoDsudoku[row][col] = nrTmp;
         }
     }
+
+    //Highlight given cells green
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            if (twoDsudoku[row][col] > 0)
+            {
+                sudokuGridTable->SetCellBackgroundColour(row, col, *wxGREEN);
+            }
+        }
+    }
     
-    sudokuObj = new sudoku(twoDsudoku);    
+    sudokuObj = new sudoku(twoDsudoku);
+
+    //Perform input check
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            if (sudokuObj->sudokuGrid[row][col] > 0)
+            {
+                int tmp = sudokuObj->sudokuGrid[row][col];
+                sudokuObj->sudokuGrid[row][col] = 0;
+                if(!sudokuObj->checkIfPossible(row, col, tmp))
+                {
+                    SetStatusText("Input error");
+                    return;
+                }
+                sudokuObj->sudokuGrid[row][col] = tmp;
+            }
+        }
+    }
+    
+        
     SetStatusText("Solving sudoku...");
     sudokuObj->solve();
 
@@ -229,6 +285,7 @@ void MyFrame::OnEmpty(wxCommandEvent& event)
         for (int  b = 0; b < 9; b++)
         {
             sudokuGridTable->SetCellValue(a, b, "");
+            sudokuGridTable->SetCellBackgroundColour(a, b, *wxWHITE);
         }
     }
 }

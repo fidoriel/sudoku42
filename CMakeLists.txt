@@ -1,23 +1,30 @@
+#build instrucions for wxWidgets: ../configure --disable-shared --disable-sys-libs
+#after compiling confirm: otool -L sudoku42.app/Contents/MacOS/sudoku42
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_BIULD_TYPE Debug)
 
-
 project(sudoku42)
+
+message("Compiler:")
+message(">    ${CMAKE_CXX_COMPILER}")
+message(">    ${CMAKE_CXX_COMPILER_ID}")
+message(">    ${CMAKE_COMPILER_IS_GNUCXX}")
+message("-----------------")
 
 if(WIN32)
 	# Tell find_package() where to look, via wxWidgets_ROOT_DIR…
 	set(wxWidgets_ROOT_DIR "C:/cThrough/wxWidgets")
 elseif(APPLE)
-	set(wxWidgets_ROOT_DIR "/Users/lucakleinschmidt/wxWidgets")
+	set(wxWidgets_ROOT_DIR "/Users/lucakleinschmidt/wxWidgets-3.1.4")
 	# Note, find_package() on OSX does not use wxWidgets_ROOT_DIR, use intermediate wx-config exe instead…
-	set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/buildOSX/wx-config")
+	set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/macbuild/wx-config")
 endif()
 
 find_package(wxWidgets COMPONENTS core base gl adv html xml xrc aui REQUIRED) # xrc needs adv
 
 #if libs are static use --libs --static instead for standard libs.
-set(WX_CONFIG_ARGS_LIBS "--libs")
+set(WX_CONFIG_ARGS_LIBS "--libs --static")
 set(WXWINDOWS_LIBRARIES "`${CMAKE_WXWINDOWS_WXCONFIG_EXECUTABLE} ${WX_CONFIG_ARGS_LIBS}`")
 
 set(CMAKE_WXWINDOWS_CXX_FLAGS "`${CMAKE_WXWINDOWS_WXCONFIG_EXECUTABLE} --cxxflags`")
@@ -46,6 +53,7 @@ endif()
 
 # Define the build target for the executable
 add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SRC_FILES})
+
 # Link required libraries to the executable
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 

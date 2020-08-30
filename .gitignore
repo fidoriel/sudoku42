@@ -20,3 +20,6 @@ test/CMakeFiles/3.17.0/CompilerIdCXX/CMakeCXXCompilerId.cpp
 test/CMakeFiles/3.17.0/CompilerIdC/CMakeCCompilerId.c
 Makefile
 CMakeFiles/3.17.0/CompilerIdC/CMakeCCompilerId.c
+build/CMakeFiles/sudoku42.dir/link.txt
+build/CMakeCache.txt
+sudoku42.app/Contents/MacOS/sudoku42
