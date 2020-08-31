@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.0)
+
+set(CMAKE_BIULD_TYPE Debug)
+
+project(sudoku42)
+
+
+set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
+set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/gtkbuild/wx-config")
+
+find_package(wxWidgets COMPONENTS core base adv html xml xrc aui REQUIRED) # xrc needs adv
+
+#if libs are static use --libs --static instead for standard libs.
+set(WX_CONFIG_ARGS_LIBS "--libs --static")
+set(WXWINDOWS_LIBRARIES "`${CMAKE_WXWINDOWS_WXCONFIG_EXECUTABLE} ${WX_CONFIG_ARGS_LIBS}`")
+
+set(CMAKE_WXWINDOWS_CXX_FLAGS "`${CMAKE_WXWINDOWS_WXCONFIG_EXECUTABLE} --cxxflags`")
+set(CMAKE_CXX_FLAGS "-no-pie")
+
+include("${wxWidgets_USE_FILE}")
+
+if(wxWidgets_FOUND)
+	message("wxWidgets found!")
+else(wxWidgets_FOUND)
+	message("wxWidgets not found!")
+endif(wxWidgets_FOUND)
+
+# Define a variable containing a list of source files for the project
+set(SRC_FILES
+    GUIsudoku.cpp
+    sudoku.cpp
+    sudoku.h
+    )
+
+# Define the build target for the executable
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+# Link required libraries to the executable
+target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
