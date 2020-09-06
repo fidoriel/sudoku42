@@ -8,11 +8,13 @@ public:
     bool solve();
     void printSudokuGrid();
     bool checkIfPossible(int row, int col, int number);
+    int getSteps();
 
     int sudokuGrid[9][9];
 
 private:
     int calculateSectorStart(int rc);
+    int backTrackSteps = 0;
 };
 
 #endif

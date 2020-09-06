@@ -95,6 +95,7 @@ bool sudoku::solve()
     {
         for (int col = 0; col < 9; col++)
         {
+            backTrackSteps++;
             if (this->sudokuGrid[row][col] == 0)
             {
                 for (int number = 1; number < 10; number++)
@@ -116,51 +117,9 @@ bool sudoku::solve()
     return true;
 }
 
-/*
-int templateG[9][9] = {{5,0,1,0,4,0,7,0,6},
-                       {0,7,2,6,1,0,4,0,9},
-                       {4,6,0,2,0,7,0,8,0},
-                       {0,4,0,0,9,1,0,7,0},
-                       {1,8,7,4,0,2,3,0,5},
-                       {0,0,5,0,8,0,0,1,4},
-                       {6,1,0,3,0,8,9,0,0},
-                       {0,0,8,9,2,0,0,4,3},
-                       {2,9,0,0,5,0,8,0,7}};
-
-sudoku su(templateG);
-
-int main(){
-    su.solve();
-    su.printSudokuGrid();
+int sudoku::getSteps()
+{
+    int steps = this->backTrackSteps;
+    this->backTrackSteps = 0;
+    return steps;
 }
-
-    int tmp = 0;
-    for (int row = 0; row < 9; row++)
-    {
-        for (int col = 0; col < 9; col++)
-        {
-            tmp += this->sudokuGrid[row][col];
-        }
-        if (tmp != 45)
-        {
-            return false;
-        }   
-        tmp = 0;    
-    }
-
-    tmp = 0;
-    for (int col = 0; col < 9; col++)
-    {
-        for (int row = 0; row < 9; row++)
-        {
-            tmp += this->sudokuGrid[row][col];
-        }
-        if (tmp != 45)
-        {
-            return false;
-        }  
-        tmp = 0;     
-    }
-
-
-*/

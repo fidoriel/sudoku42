@@ -8,8 +8,11 @@
 #include <wx/button.h>
 #include <wx/statbox.h>
 #include <wx/colour.h>
+#include <wx/textfile.h>
 
 #include "sudoku.h"
+#include <string>
+#include <fstream>
 
 //-------------------------
 // Class/Function declaration
@@ -28,17 +31,18 @@ public:
     MyFrame();
 
     //wxObjects
-    wxListBox *m_list1;
     wxGrid* sudokuGridTable;
-    wxBoxSizer* sudokuSizerPanel;
+    wxFlexGridSizer* sudokuSizerPanel;
     wxBoxSizer* buttonSizerPanel;
     wxPanel* mainPanel;
     wxMenuBar* menuBar;
+
     wxMenu* fileMenu;
     wxMenu* helpMenu;
+    wxMenu* sudokuMenu;
+
     wxButton* solveBtn;
     wxButton* emptyBtn;
-    wxStaticBox* ctrlBtnBox;
 
     sudoku* sudokuObj;
 
@@ -46,6 +50,8 @@ public:
     void OnQuit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
     void OnSolve(wxCommandEvent& event);
+    void OnSave(wxCommandEvent& event);
+    void OnOpen(wxCommandEvent& event);
     void OnEmpty(wxCommandEvent& event);
 
     enum
@@ -62,6 +68,7 @@ private:
     wxString tmp;
     int twoDsudoku[9][9];
     int nrTmp;
+    bool isSolved = false;
 };
 
 //-------------------------
@@ -72,8 +79,10 @@ private:
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
-    EVT_MENU(ID_SOLVE,  MyFrame::OnSolve)
-    EVT_MENU(ID_EMPTY,  MyFrame::OnEmpty)
+    EVT_MENU(wxID_SAVE,  MyFrame::OnSave)
+    EVT_MENU(wxID_OPEN,  MyFrame::OnOpen)
+    EVT_MENU(ID_SOLVE,   MyFrame::OnSolve)
+    EVT_MENU(ID_EMPTY,   MyFrame::OnEmpty)
 
     EVT_BUTTON(ID_SOLVE,  MyFrame::OnSolve)
     EVT_BUTTON(ID_EMPTY,  MyFrame::OnEmpty)
@@ -103,12 +112,15 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     //----------------
 
     fileMenu = new wxMenu;
+    sudokuMenu = new wxMenu;
     helpMenu = new wxMenu;
 
     helpMenu->Append(wxID_ABOUT, "&About...\tF1", "Show about dialog");
     fileMenu->Append(wxID_EXIT, "&Exit\tAlt-X", "Quit this program");
-    fileMenu->Append(ID_EMPTY, "&Empty\tCtrl-E", "Empty the Sudoku");
-    fileMenu->Append(ID_SOLVE, "&Solve\tCtrl-S", "Solve the Sudoku");
+    fileMenu->Append(wxID_OPEN, "&Open\tCtrl-O", "Open a .s42 file");
+    fileMenu->Append(wxID_SAVE, "&Save\tCtrl-S", "Save the sudoku template");
+    sudokuMenu->Append(ID_EMPTY, "&Empty\tCtrl-E", "Empty the Sudoku");
+    sudokuMenu->Append(ID_SOLVE, "&Solve\tCtrl-F", "Solve the Sudoku");
 
     //--------
     //Menu bar
@@ -117,6 +129,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     // Now append the freshly created menu to the menu bar...
     menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
+    menuBar->Append(sudokuMenu, "&Sudoku");
     menuBar->Append(helpMenu, "&Help");
 
     //attach this menu bar to the frame
@@ -126,7 +139,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     //Status bar
     //-----------
 
-    CreateStatusBar(2);
+    CreateStatusBar(1);
     SetStatusText("Welcome to sudoku42");
 
     //-------------------------
@@ -139,8 +152,8 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     // Creates a new sizer for the panel
     //-------------------------
     
-    sudokuSizerPanel = new wxBoxSizer(wxVERTICAL);
-    //buttonSizerPanel = new wxBoxSizer(wxHORIZONTAL);
+    sudokuSizerPanel = new wxFlexGridSizer(2, 1, 0, 0);
+    buttonSizerPanel = new wxBoxSizer(wxHORIZONTAL);
 
     //-------------------------
     // Creates a new grid child of panel
@@ -153,7 +166,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 	sudokuGridTable->EnableEditing(true);
 	sudokuGridTable->EnableGridLines(true);
     sudokuGridTable->SetMargins(0, 0);
-	sudokuGridTable->EnableDragGridSize(true);
+	sudokuGridTable->EnableDragGridSize(false);
 
     // Col
 	sudokuGridTable->EnableDragColMove(false);
@@ -181,22 +194,24 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 
 	sudokuGridTable->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
-    //solveBtn = new wxButton(mainPanel, ID_SOLVE, "Solve", wxPoint(10, 10), wxSize(150, 50), wxTOP);
-    //emptyBtn = new wxButton(mainPanel, ID_EMPTY, "Empty", wxPoint(10, 10), wxSize(150, 50), wxTOP);
+    solveBtn = new wxButton(mainPanel, ID_SOLVE, "Solve", wxDefaultPosition, wxSize(150, 50), wxTOP);
+    emptyBtn = new wxButton(mainPanel, ID_EMPTY, "Empty", wxDefaultPosition, wxSize(150, 50), wxTOP);
 
     // add the grid and buttons to the sizer
-    //buttonSizerPanel->Add(solveBtn, 1, wxTOP);
-    //buttonSizerPanel->AddSpacer(10);
-    //buttonSizerPanel->Add(emptyBtn, 1, wxTOP);
+    buttonSizerPanel->Add(solveBtn, 1, wxALL);
+    buttonSizerPanel->AddSpacer(10);
+    buttonSizerPanel->Add(emptyBtn, 1, wxALL);
 
-    sudokuSizerPanel->Add(sudokuGridTable, 1, wxALL | wxEXPAND);
+    sudokuSizerPanel->Add(sudokuGridTable, 1, wxALL | wxEXPAND, 10 );
 
-    //sudokuSizerPanel->Add(buttonSizerPanel, 1, wxALIGN_CENTER);
+    sudokuSizerPanel->Add(buttonSizerPanel, 1, wxALIGN_CENTER);
     // add the sizer to panel, layout and fit it
     //buttonSizerPanel->Layout();
     mainPanel->SetSizer(sudokuSizerPanel);
+    sudokuSizerPanel->AddGrowableCol(0);
     mainPanel->Layout();
 	sudokuSizerPanel->Fit(this);
+    sudokuSizerPanel->SetSizeHints(this);
 }
 
 void MyFrame::OnAbout(wxCommandEvent& event)
@@ -210,9 +225,117 @@ void MyFrame::OnAbout(wxCommandEvent& event)
     wxMessageBox(msg, "About sudoku42", wxOK | wxICON_INFORMATION, this);
 }
 
+void MyFrame::OnSave(wxCommandEvent& event)
+{
+    //Skip Event
+    //event.Skip();
+
+    wxFileDialog saveDialog(this, "Save s42 file", "", "", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if (saveDialog.ShowModal() == wxID_OK)
+    {
+        SetStatusText("Saving file...");
+    }
+    else
+    {
+        //Nutzer entschied sich die datei nicht zu Speichern
+        SetStatusText("User canceled to save the file");
+        return;
+    }
+
+    wxTextFile file(saveDialog.GetPath());
+    file.Create();
+
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            tmp = sudokuGridTable->GetCellValue(row, col);
+            nrTmp = wxAtoi(tmp);
+
+            if (nrTmp > 9 || nrTmp < 0)
+            {
+                tmp = wxString::Format(wxT("File saving error. Input error on Colum %i Row %i."), (int)(col+1), (int)(row+1));
+                SetStatusText(tmp);
+                file.Close();
+                return;
+            }
+            twoDsudoku[row][col] = nrTmp;
+        }
+    }
+
+    std::string line("");
+
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            line.append(std::to_string(twoDsudoku[row][col]));
+        }
+        file.AddLine(line);
+        line = ("");
+    }
+
+    file.Write();
+    file.Close();
+
+    SetStatusText("Saved file");
+}
+
+void MyFrame::OnOpen(wxCommandEvent& event)
+{
+    wxFileDialog openDialog(this, "Open s42 file", "", "", "sudoku42 files (*.s42)|*.s42", wxFD_OPEN);
+    if (openDialog.ShowModal() == wxID_OK)
+    {
+        SetStatusText("Opening file...");
+    }
+    else
+    {
+        //Nutzer entschied sich die datei nicht zu Speichern
+        SetStatusText("User canceled to open the file");
+        return;
+    }
+
+    wxTextFile file(openDialog.GetPath());
+    file.Open();
+
+
+
+    //übertrage Dateiinhalt in string und dann in Array
+    std::string line = file.GetFirstLine().ToStdString();
+
+    for (int col = 0; col < 9; col++)
+    {
+        twoDsudoku[0][col] = line[col] - 48;
+    }
+
+    for (int row = 1; row < 9; row++)
+    {
+        std::string line = file.GetNextLine().ToStdString();
+        for (int col = 0; col < 9; col++)
+        {
+            twoDsudoku[row][col] = line[col] - 48;
+        }
+    }
+    
+
+    file.Close();
+
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            if (twoDsudoku[row][col])
+            {
+                tmp = wxString::Format(wxT("%i"), twoDsudoku[row][col]);
+                sudokuGridTable->SetCellValue(row, col, tmp);
+            }
+        }
+    }
+    SetStatusText("File succesfully opned");
+}
+
 void MyFrame::OnSolve(wxCommandEvent& event)
 {
-
     //perform accepted number test and transform grid to array
     for (int row = 0; row < 9; row++)
     {
@@ -275,7 +398,9 @@ void MyFrame::OnSolve(wxCommandEvent& event)
             sudokuGridTable->SetCellValue(row, col, tmp);
         }
     }
-    SetStatusText("Solution found");
+    tmp = wxString::Format(wxT("Solution found. It took %i steps to do so."), (int)(sudokuObj->getSteps()));
+    SetStatusText(tmp);
+    isSolved = true;
 }
 
 void MyFrame::OnEmpty(wxCommandEvent& event)
@@ -288,8 +413,8 @@ void MyFrame::OnEmpty(wxCommandEvent& event)
             sudokuGridTable->SetCellBackgroundColour(a, b, *wxWHITE);
         }
     }
+    isSolved = false;
 }
-    
 
 void MyFrame::OnQuit(wxCommandEvent& event)
 {
