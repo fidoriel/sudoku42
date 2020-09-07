@@ -9,6 +9,8 @@
 #include <wx/statbox.h>
 #include <wx/colour.h>
 #include <wx/textfile.h>
+#include <wx/msgdlg.h>
+#include <wx/event.h>
 
 #include "sudoku.h"
 #include <string>
@@ -36,6 +38,7 @@ public:
     wxBoxSizer* buttonSizerPanel;
     wxPanel* mainPanel;
     wxMenuBar* menuBar;
+    wxTextFile* file;
 
     wxMenu* fileMenu;
     wxMenu* helpMenu;
@@ -51,8 +54,10 @@ public:
     void OnAbout(wxCommandEvent& event);
     void OnSolve(wxCommandEvent& event);
     void OnSave(wxCommandEvent& event);
+    void OnSaveAs(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
     void OnEmpty(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
 
     enum
     {
@@ -66,9 +71,13 @@ public:
 private:
     int cellSize = 50;
     wxString tmp;
+    wxString path;
     int twoDsudoku[9][9];
     int nrTmp;
     bool isSolved = false;
+    bool isSaved = false;
+
+    bool save();
 };
 
 //-------------------------
@@ -80,12 +89,16 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
     EVT_MENU(wxID_SAVE,  MyFrame::OnSave)
+    EVT_MENU(wxID_SAVEAS,MyFrame::OnSaveAs)
     EVT_MENU(wxID_OPEN,  MyFrame::OnOpen)
     EVT_MENU(ID_SOLVE,   MyFrame::OnSolve)
     EVT_MENU(ID_EMPTY,   MyFrame::OnEmpty)
 
-    EVT_BUTTON(ID_SOLVE,  MyFrame::OnSolve)
-    EVT_BUTTON(ID_EMPTY,  MyFrame::OnEmpty)
+    EVT_BUTTON(ID_SOLVE, MyFrame::OnSolve)
+    EVT_BUTTON(ID_EMPTY, MyFrame::OnEmpty)
+
+    EVT_CLOSE(MyFrame::OnClose)
+    EVT_END_SESSION(MyFrame::OnClose)
 END_EVENT_TABLE()
 
 // Implements MyApp& GetApp()
@@ -119,6 +132,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     fileMenu->Append(wxID_EXIT, "&Exit\tAlt-X", "Quit this program");
     fileMenu->Append(wxID_OPEN, "&Open\tCtrl-O", "Open a .s42 file");
     fileMenu->Append(wxID_SAVE, "&Save\tCtrl-S", "Save the sudoku template");
+    fileMenu->Append(wxID_SAVEAS, "&Save As...\tCtrl-Shift-S", "Save the sudoku template");
     sudokuMenu->Append(ID_EMPTY, "&Empty\tCtrl-E", "Empty the Sudoku");
     sudokuMenu->Append(ID_SOLVE, "&Solve\tCtrl-F", "Solve the Sudoku");
 
@@ -230,10 +244,27 @@ void MyFrame::OnSave(wxCommandEvent& event)
     //Skip Event
     //event.Skip();
 
-    wxFileDialog saveDialog(this, "Save s42 file", "", "", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if (!this->path.IsEmpty())
+    {
+        this->save();
+    }
+    else
+    {
+        this->OnSaveAs(event);
+    }
+}
+
+void MyFrame::OnSaveAs(wxCommandEvent& event)
+{
+    //Skip Event
+    //event.Skip();
+
+    wxFileDialog saveDialog(this, "Save s42 file", wxEmptyString, "sudoku", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (saveDialog.ShowModal() == wxID_OK)
     {
         SetStatusText("Saving file...");
+        this->path = saveDialog.GetPath();
+        this->save();
     }
     else
     {
@@ -241,52 +272,15 @@ void MyFrame::OnSave(wxCommandEvent& event)
         SetStatusText("User canceled to save the file");
         return;
     }
-
-    wxTextFile file(saveDialog.GetPath());
-    file.Create();
-
-    for (int row = 0; row < 9; row++)
-    {
-        for (int col = 0; col < 9; col++)
-        {
-            tmp = sudokuGridTable->GetCellValue(row, col);
-            nrTmp = wxAtoi(tmp);
-
-            if (nrTmp > 9 || nrTmp < 0)
-            {
-                tmp = wxString::Format(wxT("File saving error. Input error on Colum %i Row %i."), (int)(col+1), (int)(row+1));
-                SetStatusText(tmp);
-                file.Close();
-                return;
-            }
-            twoDsudoku[row][col] = nrTmp;
-        }
-    }
-
-    std::string line("");
-
-    for (int row = 0; row < 9; row++)
-    {
-        for (int col = 0; col < 9; col++)
-        {
-            line.append(std::to_string(twoDsudoku[row][col]));
-        }
-        file.AddLine(line);
-        line = ("");
-    }
-
-    file.Write();
-    file.Close();
-
-    SetStatusText("Saved file");
 }
 
 void MyFrame::OnOpen(wxCommandEvent& event)
 {
-    wxFileDialog openDialog(this, "Open s42 file", "", "", "sudoku42 files (*.s42)|*.s42", wxFD_OPEN);
+    wxFileDialog openDialog(this, "Open s42 file", "", "", "sudoku42 files (*.s42)|*.s42", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if (openDialog.ShowModal() == wxID_OK)
     {
         SetStatusText("Opening file...");
+        this->path = openDialog.GetPath();
     }
     else
     {
@@ -295,31 +289,30 @@ void MyFrame::OnOpen(wxCommandEvent& event)
         return;
     }
 
-    wxTextFile file(openDialog.GetPath());
-    file.Open();
-
-
+    this->file = new wxTextFile(this->path);
+    this->file->Open();
+    this->SetLabel(this->path);
 
     //übertrage Dateiinhalt in string und dann in Array
-    std::string line = file.GetFirstLine().ToStdString();
+    std::string line = file->GetFirstLine().ToStdString();
 
     for (int col = 0; col < 9; col++)
     {
-        twoDsudoku[0][col] = line[col] - 48;
+        this->twoDsudoku[0][col] = line[col] - 48;
     }
 
     for (int row = 1; row < 9; row++)
     {
-        std::string line = file.GetNextLine().ToStdString();
+        std::string line = this->file->GetNextLine().ToStdString();
         for (int col = 0; col < 9; col++)
         {
-            twoDsudoku[row][col] = line[col] - 48;
+            this->twoDsudoku[row][col] = line[col] - 48;
         }
     }
     
+    this->file->Close();
 
-    file.Close();
-
+    //Übertrage Array in grid
     for (int row = 0; row < 9; row++)
     {
         for (int col = 0; col < 9; col++)
@@ -331,7 +324,7 @@ void MyFrame::OnOpen(wxCommandEvent& event)
             }
         }
     }
-    SetStatusText("File succesfully opned");
+    SetStatusText("File succesfully opened");
 }
 
 void MyFrame::OnSolve(wxCommandEvent& event)
@@ -400,11 +393,13 @@ void MyFrame::OnSolve(wxCommandEvent& event)
     }
     tmp = wxString::Format(wxT("Solution found. It took %i steps to do so."), (int)(sudokuObj->getSteps()));
     SetStatusText(tmp);
-    isSolved = true;
+    this->isSolved = true;
+    this->isSaved = false;
 }
 
 void MyFrame::OnEmpty(wxCommandEvent& event)
 {
+    this->isSolved = false;
     for (int a = 0; a < 9; a++)
     {
         for (int  b = 0; b < 9; b++)
@@ -413,11 +408,113 @@ void MyFrame::OnEmpty(wxCommandEvent& event)
             sudokuGridTable->SetCellBackgroundColour(a, b, *wxWHITE);
         }
     }
-    isSolved = false;
 }
 
 void MyFrame::OnQuit(wxCommandEvent& event)
 {
-    // Destroy the frame
     Close();
+}
+
+void MyFrame::OnClose(wxCloseEvent& event)
+{
+    if (!this->isSaved or this->path.IsEmpty())
+    {
+        wxMessageDialog dialog(this, "Do you want to save the file?", "Disacard?", wxYES_NO | wxCANCEL | wxICON_INFORMATION);
+        switch (dialog.ShowModal())
+        {
+        case wxID_YES:
+            if (!this->path.IsEmpty())
+            {
+                this->save();
+            }
+            else
+            {
+                wxFileDialog saveDialog(this, "Save s42 file", wxEmptyString, "sudoku", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+                if (saveDialog.ShowModal() == wxID_OK)
+                {
+                    SetStatusText("Saving file...");
+                    this->path = saveDialog.GetPath();
+                    this->save();
+                }
+                else
+                {
+                    //Nutzer entschied sich die datei nicht zu Speichern
+                    SetStatusText("User canceled to save the file");
+                }
+            }
+            break;
+        case wxID_NO:
+            break;
+        case wxID_CANCEL:
+            return;
+            break;
+        default:
+            break;
+        }
+    }
+    event.Skip();
+}
+
+bool MyFrame::save()
+{
+    this->file = new wxTextFile(this->path);
+    this->SetLabel(this->path);
+    if (this->file->Exists())
+    {
+        this->file->Open();
+        this->file->Clear();
+        this->file->Write();
+    }
+    else
+    {
+        this->file->Create();
+    }
+    
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            tmp = sudokuGridTable->GetCellValue(row, col);
+            nrTmp = wxAtoi(tmp);
+
+            if (nrTmp > 9 || nrTmp < 0)
+            {
+                tmp = wxString::Format(wxT("File saving error. Input error on Colum %i Row %i."), (int)(col+1), (int)(row+1));
+                SetStatusText(tmp);
+                this->file->Close();
+                return false;
+            }
+            if (sudokuGridTable->GetCellBackgroundColour(row, col).GetAsString(wxC2S_NAME) != "white" && this->isSolved)
+            {
+                this->twoDsudoku[row][col] = nrTmp;
+            }
+            if (sudokuGridTable->GetCellBackgroundColour(row, col).GetAsString(wxC2S_NAME) == "white" && this->isSolved)
+            {
+                this->twoDsudoku[row][col] = 0;
+            }
+            else
+            {
+                this->twoDsudoku[row][col] = nrTmp;
+            }     
+        }
+    }
+
+    std::string line("");
+
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            line.append(std::to_string(this->twoDsudoku[row][col]));
+        }
+        this->file->AddLine(line);
+        line = ("");
+    }
+
+    this->file->Write();
+    this->file->Close();
+
+    SetStatusText("Saved file");
+    this->isSaved = true;
+    return true;   
 }
