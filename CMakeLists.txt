@@ -10,15 +10,23 @@ message("Compiler:")
 message(">    ${CMAKE_CXX_COMPILER}")
 message(">    ${CMAKE_CXX_COMPILER_ID}")
 message(">    ${CMAKE_COMPILER_IS_GNUCXX}")
-message("-----------------")
 
-if(WIN32)
+if(MSYS)
 	# Tell find_package() where to look, via wxWidgets_ROOT_DIR…
-	set(wxWidgets_ROOT_DIR "C:/cThrough/wxWidgets")
+	set(wxWidgets_ROOT_DIR "/home/lucak/wxWidgets-3.1.4")
+    set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/win32build/wx-config")
+    set(CMAKE_CXX_FLAGS "-no-pie")
+    message("Target: Windows32")
 elseif(APPLE)
 	set(wxWidgets_ROOT_DIR "/Users/lucakleinschmidt/wxWidgets-3.1.4")
 	# Note, find_package() on OSX does not use wxWidgets_ROOT_DIR, use intermediate wx-config exe instead…
 	set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/macbuild/wx-config")
+    message("Target: Apple")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
+    set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/gtkbuild/wx-config")
+    set(CMAKE_CXX_FLAGS "-no-pie")
+    message("Target: Linux")
 endif()
 
 find_package(wxWidgets COMPONENTS core base gl adv html xml xrc aui REQUIRED) # xrc needs adv
@@ -43,19 +51,27 @@ set(SRC_FILES
     sudoku.h
     )
 
-if(WIN32)
+if(MSYS)
     # Include a RC file for windows
-    list(APPEND SRC_FILES sample.rc)
+    #list(APPEND SRC_FILES sample.rc)
 elseif(APPLE)
     # Add an icon for the apple .app file
     list(APPEND SRC_FILES AppIcon.icns)
 endif()
 
 # Define the build target for the executable
-add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${SRC_FILES})
+if(MSYS)
+    add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
+elseif(APPLE)
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SRC_FILES})
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(${PROJECT_NAME} ${SRC_FILES})
+endif()
 
 # Link required libraries to the executable
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
+
+#After compilation processing
 
 if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -69,5 +85,4 @@ if(APPLE)
         POST_BUILD
         COMMAND plutil -replace NSHighResolutionCapable -bool true sudoku42.app/Contents/Info.plist
         )
-
 endif()

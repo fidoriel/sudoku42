@@ -11,6 +11,7 @@
 #include <wx/textfile.h>
 #include <wx/msgdlg.h>
 #include <wx/event.h>
+#include <wx/app.h>
 
 #include "sudoku.h"
 #include <string>
@@ -57,12 +58,14 @@ public:
     void OnSaveAs(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
     void OnEmpty(wxCommandEvent& event);
+    void OnNewFrame(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
     enum
     {
         ID_SOLVE = 1042,
-        ID_EMPTY = 1666
+        ID_EMPTY = 1666,
+        ID_NEW = 1012
     };
     
     // This class handles events
@@ -93,6 +96,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_OPEN,  MyFrame::OnOpen)
     EVT_MENU(ID_SOLVE,   MyFrame::OnSolve)
     EVT_MENU(ID_EMPTY,   MyFrame::OnEmpty)
+    EVT_MENU(ID_NEW,     MyFrame::OnNewFrame)
 
     EVT_BUTTON(ID_SOLVE, MyFrame::OnSolve)
     EVT_BUTTON(ID_EMPTY, MyFrame::OnEmpty)
@@ -130,6 +134,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 
     helpMenu->Append(wxID_ABOUT, "&About...\tF1", "Show about dialog");
     fileMenu->Append(wxID_EXIT, "&Exit\tAlt-X", "Quit this program");
+    //fileMenu->Append(ID_NEW, "&New\tCtrl-N", "Open new window");
     fileMenu->Append(wxID_OPEN, "&Open\tCtrl-O", "Open a .s42 file");
     fileMenu->Append(wxID_SAVE, "&Save\tCtrl-S", "Save the sudoku template");
     fileMenu->Append(wxID_SAVEAS, "&Save As...\tCtrl-Shift-S", "Save the sudoku template");
@@ -139,7 +144,6 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     //--------
     //Menu bar
     //--------
-
     // Now append the freshly created menu to the menu bar...
     menuBar = new wxMenuBar();
     menuBar->Append(fileMenu, "&File");
@@ -325,6 +329,14 @@ void MyFrame::OnOpen(wxCommandEvent& event)
         }
     }
     SetStatusText("File succesfully opened");
+}
+
+void MyFrame::OnNewFrame(wxCommandEvent& event)
+{
+    /*
+    MyFrame* m_frame = new MyFrame();
+    m_frame->Show();
+    */
 }
 
 void MyFrame::OnSolve(wxCommandEvent& event)
