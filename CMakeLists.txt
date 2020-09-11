@@ -19,52 +19,59 @@ message("C++ Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
 
 if(WIN32)
     message("Target: Windows32")
+    set(MONO 1)
+    set(wxWindowsBaseDir "C:/Users/lucak/wxWidgets-3.1.4")
     include_directories(
         includes
-        C:/Users/lucak/wxWidgets-3.1.4/include/
-        C:/Users/lucak/wxWidgets-3.1.4/lib/gcc_lib/mswu/
+        ${wxWindowsBaseDir}/include/
+        ${wxWindowsBaseDir}/lib/gcc_lib/mswu/
     )
 
     link_directories(
-        C:/Users/lucak/wxWidgets-3.1.4/lib/gcc_lib/
+        ${wxWindowsBaseDir}/lib/gcc_lib/
     )
 
-    set(WX_LIBS
-        #MONOLITHIK=0
-        #libwx_baseu_net-3.1.a
-        #libwx_baseu_xml-3.1.a
-        #libwx_baseu-3.1.a
-        #libwx_mswu_adv-3.1.a
-        #libwx_mswu_core-3.1.a
-        #libwx_mswu_adv-3.1.a
-        #libwx_mswu_gl-3.1.a
-        #libwx_mswu_html-3.1.a
-        #libwx_mswu_media-3.1.a
-        #libwx_mswu_propgrid-3.1.a
-        #libwx_mswu_qa-3.1.a
-        #libwx_mswu_ribbon-3.1.a
-        #libwx_mswu_richtext-3.1.a
-        #libwx_mswu_stc-3.1.a
-        #libwx_mswu_webview-3.1.a
-        #libwx_mswu_xrc-3.1.a
-        #libwxexpat-3.1.a
-        #libwxjpeg-3.1.a
-        #libwxpng-3.1.a
-        #libwxregexu-3.1.a
-        #libwxscintilla-3.1.a
-        #libwxtiff-3.1.a
-        #libwxzlib-3.1.a
-
-        #MONOLITHIK=1
-        libwxexpat.a
-        libwxjpeg.a
-        libwxmsw31u.a
-        libwxmsw31u_gl.a
-        libwxpng.a
-        libwxregexu.a
-        libwxscintilla.a
-        libwxzlib.a
-        libwxtiff.a
+    if(NOT MONO)
+        set(WX_LIBS
+            #MONOLITHIK=0
+            libwx_baseu_net-3.1.a
+            libwx_baseu_xml-3.1.a
+            libwx_baseu-3.1.a
+            libwx_mswu_adv-3.1.a
+            libwx_mswu_core-3.1.a
+            libwx_mswu_adv-3.1.a
+            libwx_mswu_gl-3.1.a
+            libwx_mswu_html-3.1.a
+            libwx_mswu_media-3.1.a
+            libwx_mswu_propgrid-3.1.a
+            libwx_mswu_qa-3.1.a
+            libwx_mswu_ribbon-3.1.a
+            libwx_mswu_richtext-3.1.a
+            libwx_mswu_stc-3.1.a
+            libwx_mswu_webview-3.1.a
+            libwx_mswu_xrc-3.1.a
+            libwxexpat-3.1.a
+            libwxjpeg-3.1.a
+            libwxpng-3.1.a
+            libwxregexu-3.1.a
+            libwxscintilla-3.1.a
+            libwxtiff-3.1.a
+            libwxzlib-3.1.a
+        )
+    elseif(MONO)
+        set(WX_LIBS
+            #MONOLITHIK=1
+            libwxexpat.a
+            libwxjpeg.a
+            libwxmsw31u.a
+            libwxmsw31u_gl.a
+            libwxpng.a
+            libwxregexu.a
+            libwxscintilla.a
+            libwxzlib.a
+            libwxtiff.a
+        )
+    endif()
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message("Target: Linux")
