@@ -2,7 +2,7 @@
 
 #build instrucions for wxWidgets Platform Windows MinGW: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=1 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
 #cmake CMD.exe: cmake . -G "MinGW Makefiles"
-#mingw32 Compile: mingw32-make -f Makefile
+#mingw32 Compile: mingw32-make
 
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_BIULD_TYPE Debug)
@@ -20,15 +20,15 @@ message("C++ Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
 if(WIN32)
     message("Target: Windows32")
     set(MONO 1)
-    set(wxWindowsBaseDir "C:/Users/lucak/wxWidgets-3.1.4")
+    set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4")
     include_directories(
         includes
-        ${wxWindowsBaseDir}/include/
-        ${wxWindowsBaseDir}/lib/gcc_lib/mswu/
+        "${wxWidgets_BASE_DIR_WIN}/include/"
+        "${wxWidgets_BASE_DIR_WIN}/lib/gcc_lib/mswu/"
     )
 
     link_directories(
-        ${wxWindowsBaseDir}/lib/gcc_lib/
+        "${wxWidgets_BASE_DIR_WIN}/lib/gcc_lib/"
     )
 
     if(NOT MONO)
@@ -72,7 +72,7 @@ if(WIN32)
             libwxtiff.a
         )
     endif()
-    )
+
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message("Target: Linux")
     set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
