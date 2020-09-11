@@ -1,0 +1,82 @@
+#build instrucions for wxWidgets: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=1 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
+#cmake CMD.exe: cmake . -G "MinGW Makefiles"
+#mingw32 Compile: mingw32-make -f Makefile
+
+cmake_minimum_required(VERSION 3.0)
+
+set(CMAKE_BIULD_TYPE Debug)
+
+project(sudoku42)
+
+set(CMAKE_CXX_STANDARD 11)
+include_directories(
+        includes
+        C:/Users/lucak/wxWidgets-3.1.4/include/
+        C:/Users/lucak/wxWidgets-3.1.4/lib/gcc_lib/mswu/
+)
+link_directories(
+        C:/Users/lucak/wxWidgets-3.1.4/lib/gcc_lib/
+)
+
+set(WX_LIBS
+    #MONOLITHIK=0
+    #libwx_baseu_net-3.1.a
+    #libwx_baseu_xml-3.1.a
+    #libwx_baseu-3.1.a
+    #libwx_mswu_adv-3.1.a
+    #libwx_mswu_core-3.1.a
+    #libwx_mswu_adv-3.1.a
+    #libwx_mswu_gl-3.1.a
+    #libwx_mswu_html-3.1.a
+    #libwx_mswu_media-3.1.a
+    #libwx_mswu_propgrid-3.1.a
+    #libwx_mswu_qa-3.1.a
+    #libwx_mswu_ribbon-3.1.a
+    #libwx_mswu_richtext-3.1.a
+    #libwx_mswu_stc-3.1.a
+    #libwx_mswu_webview-3.1.a
+    #libwx_mswu_xrc-3.1.a
+    #libwxexpat-3.1.a
+    #libwxjpeg-3.1.a
+    #libwxpng-3.1.a
+    #libwxregexu-3.1.a
+    #libwxscintilla-3.1.a
+    #libwxtiff-3.1.a
+    #libwxzlib-3.1.a
+
+    #MONOLITHIK=1
+    libwxexpat.a
+    libwxjpeg.a
+    libwxmsw31u.a
+    libwxmsw31u_gl.a
+    libwxpng.a
+    libwxregexu.a
+    libwxscintilla.a
+    libwxzlib.a
+    libwxtiff.a
+)
+
+
+# Define a variable containing a list of source files for the project
+set(SRC_FILES
+    GUIsudoku.cpp
+    sudoku.cpp
+    sudoku.h
+    sample.rc
+    )
+
+# Define the build target for the executable
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+# Link required libraries to the executable
+
+target_link_libraries(
+        ${PROJECT_NAME}
+        ${WX_LIBS}
+        -mwindows #suppresses CMD
+        -luxtheme
+        -loleacc
+        -lversion
+        -lshlwapi
+        -lcomctl32
+        -s
+)
