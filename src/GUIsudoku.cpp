@@ -212,8 +212,8 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 
 	sudokuGridTable->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 
-    solveBtn = new wxButton(mainPanel, ID_SOLVE, "Solve", wxDefaultPosition, wxSize(150, 50), wxTOP);
-    emptyBtn = new wxButton(mainPanel, ID_EMPTY, "Empty", wxDefaultPosition, wxSize(150, 50), wxTOP);
+    solveBtn = new wxButton(mainPanel, ID_SOLVE, "Solve", wxDefaultPosition, wxSize(150, 30));
+    emptyBtn = new wxButton(mainPanel, ID_EMPTY, "Empty", wxDefaultPosition, wxSize(150, 30));
 
     // add the grid and buttons to the sizer
     buttonSizerPanel->Add(solveBtn, 1, wxALL);

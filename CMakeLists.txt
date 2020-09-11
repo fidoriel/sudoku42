@@ -77,7 +77,8 @@ elseif(APPLE)
 endif()
 
 if(NOT WIN32)
-    find_package(wxWidgets COMPONENTS core base gl adv html xml xrc aui REQUIRED)
+    #find_package(wxWidgets COMPONENTS core base gl adv html xml xrc aui REQUIRED) Modified Linux has not all??
+    find_package(wxWidgets COMPONENTS core base adv html xml xrc aui REQUIRED)
 
     #if libs are static use --libs --static instead for standard libs.
     set(WX_CONFIG_ARGS_LIBS "--libs --static")
@@ -94,17 +95,17 @@ if(NOT WIN32)
 endif()
 
 set(SRC_FILES
-    GUIsudoku.cpp
-    sudoku.cpp
-    sudoku.h
+    src/GUIsudoku.cpp
+    src/sudoku.cpp
+    src/sudoku.h
     )
 
 if(WIN32)
     # Include a RC file for windows
-    list(APPEND SRC_FILES sample.rc)
+    list(APPEND SRC_FILES icons/sample.rc)
 elseif(APPLE)
     # Add an icon for the apple .app file
-    list(APPEND SRC_FILES AppIcon.icns)
+    list(APPEND SRC_FILES icons/AppIcon.icns)
 endif()
 
 if(WIN32)
@@ -127,11 +128,11 @@ if(APPLE)
         RESOURCE "AppIcon.icns"
         MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_COPYRIGHT "Copyright fidoriel 2020"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "sudoku42"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_NAME}"
         )
     add_custom_command(
-        TARGET sudoku42
+        TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND plutil -replace NSHighResolutionCapable -bool true sudoku42.app/Contents/Info.plist
+        COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
         )
 endif()
