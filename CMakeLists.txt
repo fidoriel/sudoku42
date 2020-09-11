@@ -111,7 +111,7 @@ if(WIN32)
     #-mwindows suppresses CMD
     set(CMAKE_CXX_FLAGS "-mwindows -luxtheme -loleacc -lversion -lshlwapi -lcomctl32 -s")
     add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
-    target_link_libraries(${PROJECT_NAME} ${WX_LIBS})
+    target_link_libraries(${PROJECT_NAME} ${WX_LIBS} ${CMAKE_CXX_FLAGS})
 elseif(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SRC_FILES})
     target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
