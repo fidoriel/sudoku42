@@ -6,10 +6,12 @@ set(CMAKE_BIULD_TYPE Debug)
 
 project(sudoku42)
 
-message("Compiler:")
-message(">    ${CMAKE_CXX_COMPILER}")
-message(">    ${CMAKE_CXX_COMPILER_ID}")
-message(">    ${CMAKE_COMPILER_IS_GNUCXX}")
+message("C Compiler: ${CMAKE_C_COMPILER}")
+message("C Compiler ID: ${CMAKE_C_COMPILER_ID}")
+message("C Compiler is GNU: ${CMAKE_COMPILER_IS_GNUC}")
+message("C Compiler: ${CMAKE_CXX_COMPILER}")
+message("C++ Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+message("C++ Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
 
 if(MSYS)
 	# Tell find_package() where to look, via wxWidgets_ROOT_DIR…
