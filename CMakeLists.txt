@@ -125,7 +125,7 @@ endif()
 #After compilation processing
 if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        RESOURCE "AppIcon.icns"
+        RESOURCE "icons/AppIcon.icns"
         MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_COPYRIGHT "Copyright fidoriel 2020"
         MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_NAME}"
