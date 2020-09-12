@@ -152,6 +152,6 @@ if(APPLE)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
+        COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}/${PROJECT_NAME}.app/Contents/Info.plist
         )
 endif()
