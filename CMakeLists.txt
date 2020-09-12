@@ -3,18 +3,24 @@
 #create build directory Mac: mkdir macbuild; cd macbuild
 #create build directory Linux: mkdir gtkbuild; cd gtkbuild
 #build instrucions for wxWidgets Platform Linux und macOS: ../configure --disable-shared --disable-sys-libs
+#change to project directory and: mkdir build; cd build
+#cmake corfigure with: cmake ..
+#compile with: make -j4
+
 
 #change build directory Win32: cd build\msw
 #build instrucions for wxWidgets Platform Windows MinGW: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=0 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
 #the build command will fail the first and second time. the thrid will be succesful
-#cmake CMD.exe: cmake . -G "MinGW Makefiles"
-#mingw32 Compile: mingw32-make
+#change to project directory and: mkdir build; cd build
+#cmake CMD.exe: cmake .. -G "MinGW Makefiles"
+#mingw32 Compile: mingw32-make -j4
 
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_BIULD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 11)
 
 project(sudoku42)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_NAME}/")
 
 message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
 message("CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -123,7 +129,7 @@ endif()
 
 if(WIN32)
     #-mwindows suppresses CMD
-    set(CMAKE_CXX_FLAGS "-mwindows -luxtheme -loleacc -lversion -lshlwapi -lcomctl32 -s")
+    set(CMAKE_CXX_FLAGS "-mwindows -luxtheme -loleacc -lversion -lshlwapi -lcomctl32 -static-libstdc++ -static-libgcc")
     add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
     target_link_libraries(${PROJECT_NAME} ${WX_LIBS} ${CMAKE_CXX_FLAGS})
 elseif(APPLE)
