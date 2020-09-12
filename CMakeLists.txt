@@ -1,6 +1,12 @@
+#Change to directory where wxwidgets is located. 
+
+#create build directory Mac: mkdir macbuild; cd macbuild
+#create build directory Linux: mkdir gtkbuild; cd gtkbuild
 #build instrucions for wxWidgets Platform Linux und macOS: ../configure --disable-shared --disable-sys-libs
 
-#build instrucions for wxWidgets Platform Windows MinGW: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=1 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
+#change build directory Win32: cd build\msw
+#build instrucions for wxWidgets Platform Windows MinGW: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=0 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
+#the build command will fail the first and second time. the thrid will be succesful
 #cmake CMD.exe: cmake . -G "MinGW Makefiles"
 #mingw32 Compile: mingw32-make
 
@@ -10,17 +16,16 @@ set(CMAKE_CXX_STANDARD 11)
 
 project(sudoku42)
 
-message("C Compiler: ${CMAKE_C_COMPILER}")
-message("C Compiler ID: ${CMAKE_C_COMPILER_ID}")
-message("C Compiler is GNU: ${CMAKE_COMPILER_IS_GNUC}")
-message("C Compiler: ${CMAKE_CXX_COMPILER}")
-message("C++ Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
-message("C++ Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
+message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
+message("CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+message("CXX Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
 
 if(WIN32)
     message("Target: Windows32")
-    set(MONO 1)
-    set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4")
+    #MONOLITHIC compiled value
+    set(MONO 0)
+    #directory where wxwidget is located root folder
+    set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4-MONO0")
     include_directories(
         includes
         "${wxWidgets_BASE_DIR_WIN}/include/"
@@ -34,29 +39,28 @@ if(WIN32)
     if(NOT MONO)
         set(WX_LIBS
             #MONOLITHIK=0
-            libwx_baseu_net-3.1.a
-            libwx_baseu_xml-3.1.a
-            libwx_baseu-3.1.a
-            libwx_mswu_adv-3.1.a
-            libwx_mswu_core-3.1.a
-            libwx_mswu_adv-3.1.a
-            libwx_mswu_gl-3.1.a
-            libwx_mswu_html-3.1.a
-            libwx_mswu_media-3.1.a
-            libwx_mswu_propgrid-3.1.a
-            libwx_mswu_qa-3.1.a
-            libwx_mswu_ribbon-3.1.a
-            libwx_mswu_richtext-3.1.a
-            libwx_mswu_stc-3.1.a
-            libwx_mswu_webview-3.1.a
-            libwx_mswu_xrc-3.1.a
-            libwxexpat-3.1.a
-            libwxjpeg-3.1.a
-            libwxpng-3.1.a
-            libwxregexu-3.1.a
-            libwxscintilla-3.1.a
-            libwxtiff-3.1.a
-            libwxzlib-3.1.a
+            libwxmsw31u_core.a #core needs to be the first one
+            libwxbase31u.a
+            libwxbase31u_net.a
+            libwxbase31u_xml.a
+            libwxexpat.a
+            libwxjpeg.a
+            libwxmsw31u_adv.a
+            libwxmsw31u_aui.a
+            libwxmsw31u_gl.a
+            libwxmsw31u_html.a
+            libwxmsw31u_media.a
+            libwxmsw31u_propgrid.a
+            libwxmsw31u_ribbon.a
+            libwxmsw31u_richtext.a
+            libwxmsw31u_stc.a
+            libwxmsw31u_webview.a
+            libwxmsw31u_xrc.a
+            libwxpng.a
+            libwxregexu.a
+            libwxscintilla.a
+            libwxtiff.a
+            libwxzlib.a
         )
     elseif(MONO)
         set(WX_LIBS
@@ -75,10 +79,12 @@ if(WIN32)
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message("Target: Linux")
+    #directory where wxwidget is located root folder
     set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
     set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/gtkbuild/wx-config")
 elseif(APPLE)
     message("Target: Apple")
+    #directory where wxwidget is located root folder
 	set(wxWidgets_ROOT_DIR "/Users/lucakleinschmidt/wxWidgets-3.1.4")
 	set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/macbuild/wx-config")
 endif()
