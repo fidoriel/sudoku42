@@ -8,6 +8,7 @@
 
 #change to project directory and: mkdir build; cd build
 #cmake corfigure with: cmake ..
+#if Linux AppImage should be created cmake .. -D RELEASE=1
 #compile with: make -j4
 
 #Windows
@@ -28,8 +29,8 @@ project(sudoku42)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_NAME}/")
 
 #set flags
-set(MONO 0)
-set(RELEASE 0)
+#set(MONO 0)
+#set(RELEASE 0)
 
 message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
 message("CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
