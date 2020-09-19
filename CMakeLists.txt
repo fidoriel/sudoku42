@@ -20,7 +20,7 @@ set(CMAKE_BIULD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 11)
 
 project(sudoku42)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_NAME}/")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_NAME}/")
 
 message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
 message("CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -138,7 +138,7 @@ elseif(APPLE)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_CXX_FLAGS "-no-pie")
     add_executable(${PROJECT_NAME} ${SRC_FILES})
-    target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES} ${CMAKE_CXX_FLAGS})
 endif()
 
 #After compilation processing
@@ -152,6 +152,6 @@ if(APPLE)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}/${PROJECT_NAME}.app/Contents/Info.plist
+        COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
         )
 endif()
