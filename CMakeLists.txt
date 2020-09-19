@@ -27,6 +27,10 @@ set(CMAKE_CXX_STANDARD 11)
 project(sudoku42)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_NAME}/")
 
+#set flags
+set(MONO 0)
+set(RELEASE 0)
+
 message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
 message("CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message("CXX Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
@@ -34,7 +38,6 @@ message("CXX Compiler is GNU: ${CMAKE_COMPILER_IS_GNUCXX}")
 if(WIN32)
     message("Target: Windows32")
     #MONOLITHIC compiled value
-    set(MONO 0)
     #directory where wxwidget is located root folder
     set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4-MONO0")
     include_directories(
@@ -94,7 +97,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
     set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/gtkbuild/wx-config")
 
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "AppDir/usr/bin/")
+    if(RELEASE)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "AppDir/usr/bin/")
+    endif()
 elseif(APPLE)
     message("Target: Apple")
     #directory where wxwidget is located root folder
@@ -160,7 +165,7 @@ if(APPLE)
         POST_BUILD
         COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
         )
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND RELEASE)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
