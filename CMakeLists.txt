@@ -93,6 +93,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #directory where wxwidget is located root folder
     set(wxWidgets_ROOT_DIR "/home/luca/wxWidgets-3.1.4")
     set(wxWidgets_CONFIG_EXECUTABLE "${wxWidgets_ROOT_DIR}/gtkbuild/wx-config")
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "AppDir/usr/bin/")
 elseif(APPLE)
     message("Target: Apple")
     #directory where wxwidget is located root folder
@@ -125,7 +127,7 @@ file(GLOB_RECURSE SRC_FILES
 
 if(WIN32)
     # Include a RC file for windows
-    list(APPEND SRC_FILES icons/sample.rc)
+    list(APPEND SRC_FILES icons/icon_win.rc)
 elseif(APPLE)
     # Add an icon for the apple .app file
     list(APPEND SRC_FILES icons/AppIcon.icns)
@@ -157,5 +159,27 @@ if(APPLE)
         TARGET ${PROJECT_NAME}
         POST_BUILD
         COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
+        )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND wget -N https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        COMMAND chmod a+x appimagetool-x86_64.AppImage
+        COMMAND cp ../icons/AppIcon.png AppDir/AppIcon.png
+
+        COMMAND rm -f AppDir/${PROJECT_NAME}.desktop
+        COMMAND touch AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo '[Desktop Entry]' >> AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo 'Name=${PROJECT_NAME}' >> AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo 'Exec=${PROJECT_NAME}' >> AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo 'Icon=AppIcon' >> AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo 'Type=Application' >> AppDir/${PROJECT_NAME}.desktop
+        COMMAND echo 'Categories=Utility\\;' >> AppDir/${PROJECT_NAME}.desktop
+
+        COMMAND wget -N https://raw.githubusercontent.com/AppImage/AppImageKit/master/src/AppRun.c
+        COMMAND gcc AppRun.c -o AppDir/AppRun
+
+        COMMAND ./appimagetool-x86_64.AppImage AppDir
         )
 endif()

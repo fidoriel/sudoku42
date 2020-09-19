@@ -15,7 +15,8 @@
 
 #include "sudoku.h"
 #include <string>
-#include <fstream>
+
+#include "../icons/AppIcon.xpm"
 
 //-------------------------
 // Class/Function declaration
@@ -124,6 +125,11 @@ bool MyApp::OnInit()
 
 MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSize(640, 400), wxCLOSE_BOX /*| wxMINIMIZE_BOX | wxMAXIMIZE_BOX */| wxCAPTION | wxSYSTEM_MENU | wxCLIP_CHILDREN)
 {
+
+    // add the appicon
+
+    SetIcon(wxICON(AppIcon));
+
     //----------------
     //Create the menu
     //----------------
