@@ -167,11 +167,19 @@ if(APPLE)
         COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
         )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND RELEASE)
+    if(ARM7)
+        set(AppImageRelease "appimagetool-armhf.AppImage")
+    elseif(ARMV8)
+        set(AppImageRelease "appimagetool-aarch64.AppImage")
+    else()
+        set(AppImageRelease "appimagetool-x86_64.AppImage")
+    endif()
+
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND wget -N https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-        COMMAND chmod a+x appimagetool-x86_64.AppImage
+        COMMAND wget -N https://github.com/AppImage/AppImageKit/releases/download/continuous/${AppImageRelease}
+        COMMAND chmod a+x ${AppImageRelease}
         COMMAND cp ../icons/AppIcon.png AppDir/AppIcon.png
 
         COMMAND rm -f AppDir/${PROJECT_NAME}.desktop
