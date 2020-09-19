@@ -167,10 +167,12 @@ if(APPLE)
         COMMAND plutil -replace NSHighResolutionCapable -bool true ${PROJECT_NAME}.app/Contents/Info.plist
         )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND RELEASE)
-    if(ARM7)
+    if(ARMV7)
         set(AppImageRelease "appimagetool-armhf.AppImage")
     elseif(ARMV8)
         set(AppImageRelease "appimagetool-aarch64.AppImage")
+    elseif(I386)
+        set(AppImageRelease "appimagetool-i686.AppImage")
     else()
         set(AppImageRelease "appimagetool-x86_64.AppImage")
     endif()
@@ -194,6 +196,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND RELEASE)
         COMMAND wget -N https://raw.githubusercontent.com/AppImage/AppImageKit/master/src/AppRun.c
         COMMAND gcc AppRun.c -o AppDir/AppRun
 
-        COMMAND ./appimagetool-x86_64.AppImage AppDir
+        COMMAND ./${AppImageRelease} AppDir
         )
 endif()
