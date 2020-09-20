@@ -82,6 +82,7 @@ private:
     bool isSaved = false;
 
     bool save();
+    bool checkIfSudokuIsEmpty();
 };
 
 //-------------------------
@@ -191,6 +192,9 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 	sudokuGridTable->EnableGridLines(true);
     sudokuGridTable->SetMargins(0, 0);
 	sudokuGridTable->EnableDragGridSize(false);
+
+    //sudokuGridTable->SetGridLineColour(*wxBLACK);
+    sudokuGridTable->SetCellHighlightColour(*wxRED);
 
     // Col
 	sudokuGridTable->EnableDragColMove(false);
@@ -435,39 +439,45 @@ void MyFrame::OnQuit(wxCommandEvent& event)
 
 void MyFrame::OnClose(wxCloseEvent& event)
 {
-    if (!this->isSaved or this->path.IsEmpty())
+    if (!this->checkIfSudokuIsEmpty())
     {
-        wxMessageDialog dialog(this, "Do you want to save the file?", "Disacard?", wxYES_NO | wxCANCEL | wxICON_INFORMATION);
-        switch (dialog.ShowModal())
+        if (!this->isSaved or this->path.IsEmpty())
         {
-        case wxID_YES:
-            if (!this->path.IsEmpty())
+            wxMessageDialog dialog(this, "Do you want to save the file?", "Disacard?", wxYES_NO | wxCANCEL | wxICON_INFORMATION);
+            switch (dialog.ShowModal())
             {
-                this->save();
-            }
-            else
-            {
-                wxFileDialog saveDialog(this, "Save s42 file", wxEmptyString, "sudoku", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-                if (saveDialog.ShowModal() == wxID_OK)
+            case wxID_YES:
+                if (!this->path.IsEmpty())
                 {
-                    SetStatusText("Saving file...");
-                    this->path = saveDialog.GetPath();
                     this->save();
                 }
                 else
                 {
-                    //Nutzer entschied sich die datei nicht zu Speichern
-                    SetStatusText("User canceled to save the file");
+                    wxFileDialog saveDialog(this, "Save s42 file", wxEmptyString, "sudoku", "sudoku42 files (*.s42)|*.s42", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+                    if (saveDialog.ShowModal() == wxID_OK)
+                    {
+                        SetStatusText("Saving file...");
+                        this->path = saveDialog.GetPath();
+                        this->save();
+                    }
+                    else
+                    {
+                        //Nutzer entschied sich die datei nicht zu Speichern
+                        SetStatusText("User canceled to save the file");
+                    }
                 }
+                break;
+
+            case wxID_NO:
+                break;
+
+            case wxID_CANCEL:
+                return;
+                break;
+
+            default:
+                break;
             }
-            break;
-        case wxID_NO:
-            break;
-        case wxID_CANCEL:
-            return;
-            break;
-        default:
-            break;
         }
     }
     event.Skip();
@@ -535,4 +545,19 @@ bool MyFrame::save()
     SetStatusText("Saved file");
     this->isSaved = true;
     return true;   
+}
+
+bool MyFrame::checkIfSudokuIsEmpty()
+{
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            if(wxAtoi(sudokuGridTable->GetCellValue(row, col)))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
