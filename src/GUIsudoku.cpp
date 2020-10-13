@@ -85,11 +85,11 @@ private:
     bool checkIfSudokuIsEmpty();
 };
 
-class MyGridCellRenderer : public wxGridCellStringRenderer
+/*class CellRectangleBlackSector : public wxGridCellStringRenderer
 {
 public:
     virtual void Draw(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc, const wxRect& rect, int row, int col, bool isSelected) wxOVERRIDE;
-};
+};*/
 
 //-------------------------
 // Macro stuff
@@ -130,7 +130,7 @@ bool MyApp::OnInit()
     return true;
 }
 
-MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSize(640, 400), wxCLOSE_BOX /*| wxMINIMIZE_BOX | wxMAXIMIZE_BOX */| wxCAPTION | wxSYSTEM_MENU | wxCLIP_CHILDREN)
+MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSize(640, 400), wxCLOSE_BOX | wxMINIMIZE_BOX /*| wxMAXIMIZE_BOX */| wxCAPTION | wxSYSTEM_MENU | wxCLIP_CHILDREN)
 {
 
     // add the appicon
@@ -195,11 +195,11 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
     // Grid
 	sudokuGridTable->CreateGrid(9, 9);
 	sudokuGridTable->EnableEditing(true);
-	sudokuGridTable->EnableGridLines(true);
+	//sudokuGridTable->EnableGridLines(true);
     sudokuGridTable->SetMargins(-2, -2);
 	sudokuGridTable->EnableDragGridSize(false);
 
-    sudokuGridTable->SetGridLineColour(*wxBLACK);
+    //sudokuGridTable->SetGridLineColour(*wxBLACK);
     sudokuGridTable->SetCellHighlightColour(*wxRED);
 
     // Col
@@ -212,13 +212,8 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "sudoku42" , wxPoint(30, 30), wxSiz
 	sudokuGridTable->HideRowLabels();
 
     //Set Cell Renderer/borders
-    for (int row = 0; row < 9; row++)
-    {
-        for (int col = 0; col < 9; col++)
-        {
-            sudokuGridTable->SetCellRenderer(row, col, new MyGridCellRenderer);
-        }
-    }
+
+    //sudokuGridTable->SetCellRenderer(5, 5, new CellRectangleBlackSector);
        
     // Set sizes
     for (int i = 0; i < 9; i++)
@@ -577,12 +572,11 @@ bool MyFrame::checkIfSudokuIsEmpty()
     return true;
 }
 
-
-void MyGridCellRenderer::Draw(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc, const wxRect& rect, int row, int col, bool isSelected)
+/* void CellRectangleBlackSector::Draw(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc, const wxRect& rect, int row, int col, bool isSelected)
 {
     wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
 
     dc.SetPen(*wxBLACK_PEN);
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.DrawRectangle(rect);
-}
+    dc.DrawRectangle(wxPoint(5, 5), wxSize(10, 10));
+}*/
