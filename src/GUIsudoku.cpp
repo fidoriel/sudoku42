@@ -397,7 +397,7 @@ void MyFrame::OnSolve( wxCommandEvent& event )
         {
             if ( twoDsudoku[ row ][ col ] > 0 )
             {
-                sudokuGridTable->SetCellBackgroundColour( row, col, *wxGREEN );
+                sudokuGridTable->SetCellBackgroundColour( row, col, *wxLIGHT_GREY );
             }
         }
     }
