@@ -14,6 +14,7 @@
 #Windows
 #change build directory Win32: cd build\msw
 #build instrucions for wxWidgets Platform Windows MinGW: mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=0 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON
+#mingw32-make SHELL=CMD.exe -j4 -f makefile.gcc BUILD=release UNICODE=1 SHARED=0 MONOLITHIC=0 DwxUSE_LIBPNG=builtin DwxUSE_ZLIB=builtin DCMAKE_POSITION_INDEPENDENT_CODE=ON LDFLAGS=-Wl,--allow-multiple-definition
 #the build command will fail the first and second time. the thrid will be succesful
 #mingw32 Compile: mingw32-make -j4
 
@@ -40,7 +41,7 @@ if(WIN32)
     message("Target: Windows32")
     #MONOLITHIC compiled value
     #directory where wxwidget is located root folder
-    set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4-MONO0")
+    set(wxWidgets_BASE_DIR_WIN "C:/Users/lucak/wxWidgets-3.1.4")
     include_directories(
         includes
         "${wxWidgets_BASE_DIR_WIN}/include/"
@@ -141,7 +142,7 @@ endif()
 
 if(WIN32)
     #-mwindows suppresses CMD
-    set(CMAKE_CXX_FLAGS "-mwindows -luxtheme -loleacc -lversion -lshlwapi -lcomctl32 -static-libstdc++ -static-libgcc")
+    set(CMAKE_CXX_FLAGS "-mwindows -luxtheme -loleacc -lversion -lshlwapi -lcomctl32 -static-libstdc++ -static-libgcc -W")
     add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
     target_link_libraries(${PROJECT_NAME} ${WX_LIBS} ${CMAKE_CXX_FLAGS})
 elseif(APPLE)
