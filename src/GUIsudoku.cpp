@@ -226,6 +226,7 @@ MyFrame::MyFrame() : wxFrame( NULL, wxID_ANY, "sudoku42" , wxPoint( 30, 30 ), wx
     attr = new wxGridCellAttr;
     attr->SetBackgroundColour( *wxWHITE );
     attr->SetTextColour( *wxBLACK );
+    attr->SetFont( wxFontInfo( 40 ) );
     
     for ( int i = 0; i < 9; i++ )
     {
@@ -238,7 +239,6 @@ MyFrame::MyFrame() : wxFrame( NULL, wxID_ANY, "sudoku42" , wxPoint( 30, 30 ), wx
         for ( size_t row = 0; row < 9; row++ )
         {
             sudokuGridTable->SetAttr( row, col, attr);
-            sudokuGridTable->SetCellFont( row, col, wxFontInfo( 40 ) );
             sudokuGridTable->SetCellRenderer( row, col, new sudokuRenderer() );
         }
     }
