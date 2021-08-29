@@ -142,7 +142,7 @@ public:
                       bool isSelected ) wxOVERRIDE;
 };
 
-MyFrame::MyFrame() : wxFrame( NULL, wxID_ANY, "sudoku42" , wxPoint( 30, 30 ), wxSize( 640, 400 ), wxCLOSE_BOX | wxMINIMIZE_BOX /*| wxMAXIMIZE_BOX */| wxCAPTION | wxSYSTEM_MENU | wxCLIP_CHILDREN )
+MyFrame::MyFrame() : wxFrame( NULL, wxID_ANY, "sudoku42" , wxPoint( 30, 30 ), wxSize( 400, 640 ), wxCLOSE_BOX | wxMINIMIZE_BOX /*| wxMAXIMIZE_BOX */| wxCAPTION | wxSYSTEM_MENU | wxCLIP_CHILDREN )
 {
 
     // add the appicon
@@ -262,6 +262,8 @@ MyFrame::MyFrame() : wxFrame( NULL, wxID_ANY, "sudoku42" , wxPoint( 30, 30 ), wx
     mainPanel->Layout();
 	sudokuSizerPanel->Fit( this );
     sudokuSizerPanel->SetSizeHints( this );
+    // Fit window to panel size
+    this->SetClientSize(mainPanel->GetBestSize());
 }
 
 void MyFrame::OnAbout( wxCommandEvent& event )

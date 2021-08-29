@@ -29,7 +29,7 @@ set( CMAKE_CXX_STANDARD 11 )
 
 project( sudoku42 )
 
-set( WXWIDGETS_VERSION_IN_HOME_DIR "wxWidgets-3.1.4" )
+set( WXWIDGETS_VERSION_IN_HOME_DIR "wxWidgets" )
 
 message( "CXX Compiler: ${CMAKE_CXX_COMPILER}" )
 message( "CXX Compiler ID: ${CMAKE_CXX_COMPILER_ID}" )
